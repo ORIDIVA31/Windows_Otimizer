@@ -132,6 +132,14 @@
 
   .download-btn:hover { background: #4dffa0; }
   .download-btn:active { transform: scale(0.98); }
+  .download-btn:disabled {
+    background: var(--line);
+    color: var(--text-dim);
+    cursor: not-allowed;
+  }
+
+  .note.erro { color: #ff6b6b; }
+  .note.erro strong { color: #ff6b6b; }
 
   .note {
     margin-top: 18px;
@@ -175,29 +183,67 @@
       <div class="progress-row"><span>envio por e-mail</span><span class="ok">concluído</span></div>
     </div>
 
-    <a href="#" id="downloadLink" class="download-btn">
+    <button id="downloadLink" class="download-btn" onclick="solicitarDownload()">
       Baixar Otimizador de Performance
-    </a>
+    </button>
 
-    <p class="note"><strong>Link pessoal e de uso único</strong> — não compartilhe com outras pessoas.</p>
+    <p class="note" id="statusNote"><strong>Link pessoal e de uso único</strong> — não compartilhe com outras pessoas.</p>
   </div>
 
   <div class="footer-line">PEDIDO #<span id="orderId">000000</span></div>
 </div>
 
 <script>
-  // Substitua pela lógica real: ler o link e o ID do pedido a partir
-  // dos parâmetros da URL (?link=...&pedido=...) enviados pela página
-  // de redirecionamento após a confirmação do Apps Script/Mercado Pago.
+  // URL do seu Apps Script publicado como Web App.
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzzz-olTXhoMhZWODREt3G6O5RIvOotcFbENgU9UL6FutZJaTJCwry3DlFEWR2ZP9bI_Q/exec";
+
   const params = new URLSearchParams(window.location.search);
-  const link = params.get('link');
+  const token = params.get('token');
   const pedido = params.get('pedido');
 
-  if (link) {
-    document.getElementById('downloadLink').href = link;
-  }
   if (pedido) {
     document.getElementById('orderId').textContent = pedido;
+  }
+
+  const btn = document.getElementById('downloadLink');
+  const nota = document.getElementById('statusNote');
+
+  if (!token) {
+    desativarBotao("Link inválido. Verifique o e-mail enviado após a compra.");
+  }
+
+  async function solicitarDownload() {
+    if (!token) return;
+
+    btn.disabled = true;
+    btn.textContent = "Verificando...";
+
+    try {
+      const resposta = await fetch(`${APPS_SCRIPT_URL}?token=${encodeURIComponent(token)}`);
+      const dados = await resposta.json();
+
+      if (dados.status === "ok") {
+        // Dispara o download do arquivo liberado para este token.
+        window.location.href = dados.linkDownload;
+        desativarBotao("Este link já foi utilizado e não pode ser usado novamente.");
+      } else if (dados.status === "usado") {
+        desativarBotao("Este link já foi utilizado e não pode ser usado novamente.");
+      } else {
+        desativarBotao("Não foi possível validar o link. Fale com o suporte.");
+      }
+    } catch (erro) {
+      btn.disabled = false;
+      btn.textContent = "Baixar Otimizador de Performance";
+      nota.textContent = "Erro de conexão. Tente novamente.";
+      nota.classList.add("erro");
+    }
+  }
+
+  function desativarBotao(mensagem) {
+    btn.disabled = true;
+    btn.textContent = "Download indisponível";
+    nota.innerHTML = `<strong>${mensagem}</strong>`;
+    nota.classList.add("erro");
   }
 </script>
 
