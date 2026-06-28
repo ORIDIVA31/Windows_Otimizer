@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pagamento confirmado</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #131a23;
+    --line: #1f2a37;
+    --accent: #39ff88;
+    --accent-dim: #1d8f52;
+    --text: #e6edf3;
+    --text-dim: #8b96a3;
+    --mono: 'IBM Plex Mono', 'Courier New', monospace;
+    --sans: 'Inter', -apple-system, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 480px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .terminal-bar {
+    display: flex;
+    gap: 8px;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--line);
+    background: #0a0f15;
+  }
+
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot:nth-child(1) { background: #ff5f56; }
+  .dot:nth-child(2) { background: #ffbd2e; }
+  .dot:nth-child(3) { background: #27c93f; }
+
+  .content {
+    padding: 36px 32px 32px;
+  }
+
+  .status-line {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--accent);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .status-line::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--accent);
+  }
+
+  h1 {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0 0 8px;
+    letter-spacing: -0.01em;
+  }
+
+  .subtitle {
+    color: var(--text-dim);
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0 0 28px;
+  }
+
+  .progress {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+    background: #0a0f15;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 24px;
+  }
+
+  .progress-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+
+  .progress-row:last-child { margin-bottom: 0; }
+
+  .progress-row .ok { color: var(--accent); }
+
+  .download-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 15px;
+    background: var(--accent);
+    color: #08130c;
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 15px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s ease, transform 0.1s ease;
+  }
+
+  .download-btn:hover { background: #4dffa0; }
+  .download-btn:active { transform: scale(0.98); }
+
+  .note {
+    margin-top: 18px;
+    font-size: 12.5px;
+    color: var(--text-dim);
+    line-height: 1.5;
+    text-align: center;
+  }
+
+  .note strong { color: var(--text); }
+
+  .footer-line {
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="terminal-bar">
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+  </div>
+
+  <div class="content">
+    <div class="status-line">PAGAMENTO CONFIRMADO</div>
+
+    <h1>Seu acesso está liberado</h1>
+    <p class="subtitle">Obrigado pela compra. O link abaixo também foi enviado para o seu e-mail, caso precise dele depois.</p>
+
+    <div class="progress">
+      <div class="progress-row"><span>verificação do pagamento</span><span class="ok">concluído</span></div>
+      <div class="progress-row"><span>geração do link de acesso</span><span class="ok">concluído</span></div>
+      <div class="progress-row"><span>envio por e-mail</span><span class="ok">concluído</span></div>
+    </div>
+
+    <a href="#" id="downloadLink" class="download-btn">
+      Baixar Otimizador de Performance
+    </a>
+
+    <p class="note"><strong>Link pessoal e de uso único</strong> — não compartilhe com outras pessoas.</p>
+  </div>
+
+  <div class="footer-line">PEDIDO #<span id="orderId">000000</span></div>
+</div>
+
+<script>
+  // Substitua pela lógica real: ler o link e o ID do pedido a partir
+  // dos parâmetros da URL (?link=...&pedido=...) enviados pela página
+  // de redirecionamento após a confirmação do Apps Script/Mercado Pago.
+  const params = new URLSearchParams(window.location.search);
+  const link = params.get('link');
+  const pedido = params.get('pedido');
+
+  if (link) {
+    document.getElementById('downloadLink').href = link;
+  }
+  if (pedido) {
+    document.getElementById('orderId').textContent = pedido;
+  }
+</script>
+
+</body>
+</html>
